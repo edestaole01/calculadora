@@ -116,7 +116,7 @@ export const ICMS = {
     'PE': 0.205,  'PI': 0.225,  'PR': 0.195,  'RJ': 0.22,   'RN': 0.20,  // PI corrigido
     'RO': 0.195,  'RR': 0.20,   'RS': 0.17,   'SC': 0.17,   'SE': 0.20,  // SE corrigido
     'SP': 0.18,   'TO': 0.20
-};clas
+};
 
 export const TRANSICAO = {
     2025: {antigo:1, cbs:0, ibs:0, cbsAliq:0, ibsAliq:0},
