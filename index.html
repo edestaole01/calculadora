@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Tributária 2026-2033 - Master Live Edition</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📊 Calculadora Tributária 2026-2033 (Master)</h1>
+                <div class="sub">Simulação Automática: Split Payment, Créditos B2B e Transição LCP 214/25</div>
+            </div>
+            <span class="badge">✓ Ao Vivo (Live Calculation)</span>
+        </div>
+
+        <div class="tabs" id="mainTabs">
+            <button class="tab active" data-tab="calc">🧮 Calculadora</button>
+            <button class="tab" data-tab="transicao">📅 Transição Ano a Ano</button>
+            <button class="tab" data-tab="comparativo">📊 Comparativo Completo</button>
+            <button class="tab" data-tab="tabelas">📋 Tabelas</button>
+            <button class="tab" data-tab="entenda">❓ Entenda a Reforma</button>
+        </div>
+
+        <div id="tab_calc" class="tab-content active">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">⚙️ Dados da Empresa</div>
+                    <form id="form">
+                        <div class="section">
+                            <div class="section-title">📌 Atividade Principal</div>
+                            <div class="row single">
+                                <div>
+                                    <label>CNAE Principal <span style="color:#888;font-weight:400">(opcional)</span></label>
+                                    <div class="cnae-search">
+                                        <input type="text" id="cnaeInput" placeholder="🔍 Digite código ou descrição..." autocomplete="off">
+                                        <div id="cnaeList" class="cnae-list"></div>
+                                    </div>
+                                    <div class="hint" id="cnaeInfo">Define automaticamente o Anexo do Simples e elegibilidade MEI</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">🏢 Localização e Tipo</div>
+                            <div class="row">
+                                <div>
+                                    <label>Tipo de Atividade</label>
+                                    <select id="tipo">
+                                        <option value="servicos">📋 Prestação de Serviços</option>
+                                        <option value="comercio">🛒 Comércio</option>
+                                        <option value="industria">🏭 Indústria</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>Estado (UF) - ICMS</label>
+                                    <select id="uf">
+                                        <option value="">Carregando...</option>
+                                    </select>
+                                    <div class="hint">Alíquota ICMS interna do estado</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div>
+                                    <label>
+                                        Alíquota ISS do Município
+                                        <span class="tooltip-icon" title="O ISS varia de 2% a 5% conforme a legislação municipal. Consulte sua prefeitura.">?</span>
+                                    </label>
+                                    <div class="input-iss">
+                                        <input type="number" id="issAliq" value="5" min="2" max="5" step="0.5">
+                                    </div>
+                                    <div class="range-container">
+                                        <span style="font-size:11px;color:#4caf50;font-weight:600;">2%</span>
+                                        <input type="range" id="issRange" min="2" max="5" step="0.5" value="5">
+                                        <span style="font-size:11px;color:#f44336;font-weight:600;">5%</span>
+                                    </div>
+                                    <div class="info-inline warning" style="margin-top:10px;">
+                                        <span>⚠️</span>
+                                        <span>Aplica-se apenas para <strong>Prestadores de Serviços</strong>. Comércio/Indústria pagam ICMS.</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label>Regime Diferenciado (LCP 214/25)</label>
+                                    <select id="regimeEspecial">
+                                        <option value="padrao">⚪ Padrão (Sem redução)</option>
+                                        <option value="prof_liberal">👔 Profissional Liberal (-30%)</option>
+                                        <option value="saude">🏥 Saúde (-60%)</option>
+                                        <option value="educacao">📚 Educação (-60%)</option>
+                                        <option value="cultura">🎭 Cultura/Artístico (-60%)</option>
+                                        <option value="transporte">🚌 Transporte Coletivo (-60%)</option>
+                                        <option value="agro">🌾 Insumos Agro/Alimentos (-60%)</option>
+                                    </select>
+                                    <div class="hint">Redução na alíquota CBS/IBS conforme LC 214/25</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">💰 Faturamento e Créditos</div>
+                            <div class="row">
+                                <div>
+                                    <label>Receita Bruta Anual (12 meses)</label>
+                                    <div class="input-money">
+                                        <input type="text" id="fatAnual" placeholder="0,00" class="money-mask">
+                                    </div>
+                                    <div class="hint">Faturamento total dos últimos 12 meses</div>
+                                </div>
+                                <div>
+                                    <label>Compras/Insumos com NF (B2B)</label>
+                                    <div class="input-money">
+                                        <input type="text" id="comprasAnual" placeholder="0,00" class="money-mask">
+                                    </div>
+                                    <div class="hint">Gera crédito de CBS/IBS no novo sistema</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">👥 Folha de Pagamento (Fator R)</div>
+                            <div class="row">
+                                <div>
+                                    <label>Folha de Pagamento Anual</label>
+                                    <div class="input-money">
+                                        <input type="text" id="folhaAnual" placeholder="0,00" class="money-mask">
+                                    </div>
+                                    <div class="hint">Salários + pró-labore + encargos (12 meses)</div>
+                                </div>
+                                <div>
+                                    <label>Fator R (Calculado)</label>
+                                    <input type="text" id="fatorR" readonly placeholder="0,00%">
+                                    <div class="hint">Se ≥ 28%, Anexo V migra para III</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">📊 Custos Operacionais (Lucro Real)</div>
+                            <div class="row single">
+                                <div>
+                                    <label>Custos e Despesas Totais (%)</label>
+                                    <div class="input-percent">
+                                        <input type="number" id="custoP" value="75" min="0" max="100">
+                                    </div>
+                                    <div class="hint">Percentual do faturamento comprometido com custos (CMV + despesas operacionais)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">📅 Ano de Referência da Simulação</div>
+                            <div class="year-selector" id="yearSelector">
+                                <button type="button" class="year-btn" data-year="2025">2025</button>
+                                <button type="button" class="year-btn highlight active" data-year="2026">2026</button>
+                                <button type="button" class="year-btn" data-year="2027">2027</button>
+                                <button type="button" class="year-btn" data-year="2028">2028</button>
+                                <button type="button" class="year-btn" data-year="2029">2029</button>
+                                <button type="button" class="year-btn" data-year="2030">2030</button>
+                                <button type="button" class="year-btn" data-year="2031">2031</button>
+                                <button type="button" class="year-btn" data-year="2032">2032</button>
+                                <button type="button" class="year-btn" data-year="2033">2033</button>
+                            </div>
+                            <div class="hint" id="yearInfo" style="font-size:11px;padding:8px;background:#e3f2fd;border-radius:6px;color:#1565c0;">
+                                2026 - Fase de teste: CBS/IBS 1% compensável.
+                            </div>
+                        </div>
+
+                        <!-- DISCLAIMER -->
+                        <div class="disclaimer-box">
+                            <div class="title">⚠️ Aviso Importante</div>
+                            <p>Esta calculadora é uma <strong>ferramenta de simulação</strong> para fins educacionais e de planejamento.</p>
+                            <ul>
+                                <li>Os valores são <strong>estimativas</strong> baseadas na legislação vigente (EC 132/2023, LC 214/2025)</li>
+                                <li>Alíquotas de ICMS podem variar conforme NCM, origem/destino e benefícios fiscais</li>
+                                <li>ISS varia de 2% a 5% conforme o município - <strong>consulte sua prefeitura</strong></li>
+                                <li>Transição do Simples Nacional (2029+) ainda <strong>não está regulamentada</strong></li>
+                                <li><strong>Consulte sempre um contador</strong> para decisões fiscais definitivas</li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+
+                <div>
+                    <div id="resultados" class="hidden">
+                        <div class="summary">
+                            <div style="text-align:center;margin-bottom:15px;">
+                                <span style="font-size:14px;opacity:0.8;">Simulação para</span>
+                                <span style="font-size:28px;font-weight:800;margin-left:10px;" id="anoTitulo">2026</span>
+                            </div>
+                            <div class="summary-grid">
+                                <div>
+                                    <div class="summary-label">Melhor Regime</div>
+                                    <div class="summary-value" id="sumMelhor">-</div>
+                                </div>
+                                <div>
+                                    <div class="summary-label">Carga Total</div>
+                                    <div class="summary-value" id="sumCarga">-</div>
+                                </div>
+                                <div>
+                                    <div class="summary-label">Tributos/Ano</div>
+                                    <div class="summary-value" id="sumTributos">-</div>
+                                </div>
+                                <div>
+                                    <div class="summary-label">Crédito Gerado</div>
+                                    <div class="summary-value" style="color:#69f0ae" id="sumCreditos">-</div>
+                                    <div class="summary-sub">CBS/IBS (B2B)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cashflow-box" id="cardSplit">
+                            <div class="cf-title">
+                                <span>💳 Fluxo de Caixa & Split Payment</span>
+                            </div>
+                            <div class="cf-row">
+                                <span>Faturamento Bruto:</span>
+                                <span style="font-weight:700" id="cfBruto">R$ 0,00</span>
+                            </div>
+                            <div class="cf-row" style="color:#c62828">
+                                <span>(-) Retenção Automática (Split Payment):</span>
+                                <span id="cfSplit">R$ 0,00</span>
+                            </div>
+                            <div class="cf-row" style="color:#1565c0">
+                                <span>(+) Recuperação Créditos (Compras):</span>
+                                <span id="cfRecuperado">R$ 0,00</span>
+                            </div>
+                            <div class="cf-total">
+                                <span>Disponível Líquido (Estimado):</span>
+                                <span id="cfLiquido">R$ 0,00</span>
+                            </div>
+                            <div style="font-size:10px; color:#666; margin-top:5px;">*A partir de 2027, o imposto é retido no ato do recebimento.</div>
+                            <div class="split-note"></div>
+                        </div>
+
+                        <div class="card" id="cardSistemas">
+                            <div class="card-title">⚖️ Sistemas Tributários Simultâneos</div>
+                            <div id="sistemasGrid"></div>
+                        </div>
+
+                        <div class="results" id="cards"></div>
+
+                        <div class="card">
+                            <div class="card-title">📊 Composição da Carga Tributária</div>
+                            <div id="chartComposicao"></div>
+                        </div>
+
+                        <!-- DISCLAIMER RESULTADOS -->
+                        <div class="disclaimer-box">
+                            <div class="title">📋 Notas sobre os Resultados</div>
+                            <ul>
+                                <li>Valores são <strong>aproximados</strong> e podem variar conforme particularidades do negócio</li>
+                                <li>Não considera: substituição tributária, diferencial de alíquota (DIFAL), incentivos fiscais</li>
+                                <li>MEI: valores baseados no salário mínimo de 2026 (R$ 1.621,00)</li>
+                                <li>Lucro Real: considera apenas IRPJ/CSLL sobre lucro líquido estimado</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div id="placeholder" class="card" style="text-align:center;padding:60px 20px;color:#999;">
+                        <div style="font-size:50px;margin-bottom:15px;">🧮</div>
+                        <h3 style="color:#666;margin-bottom:8px;">Aguardando dados</h3>
+                        <p style="font-size:12px;">Preencha o faturamento para ver os resultados.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab_transicao" class="tab-content">
+            <div class="card">
+                <div class="card-title">📅 Cronograma da Transição (LCP 214/2025)</div>
+                <table>
+                    <thead>
+                        <tr><th>Ano</th><th>Sistema Antigo</th><th>Sistema Novo (CBS/IBS)</th><th>Observação</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>2025</td><td>100% (PIS/COF/ICMS/ISS)</td><td>-</td><td>Atual</td></tr>
+                        <tr style="background:#e3f2fd"><td>2026</td><td>100%</td><td>1% (Compensável)</td><td>Fase de Teste - NFs destacam IBS/CBS</td></tr>
+                        <tr style="background:#fff3e0"><td>2027</td><td>PIS/COF Extintos</td><td>CBS 8,8% + IBS 0,1%</td><td>Início Split Payment (B2C obrigatório)</td></tr>
+                        <tr><td>2028</td><td>ICMS/ISS 100%</td><td>CBS Cheia + IBS 0,1%</td><td>Estabilização</td></tr>
+                        <tr><td>2029</td><td>ICMS/ISS reduz p/ 90%</td><td>IBS sobe (10% ref)</td><td>Transição Estadual</td></tr>
+                        <tr><td>2030</td><td>ICMS/ISS reduz p/ 80%</td><td>IBS sobe (20% ref)</td><td>Transição Estadual</td></tr>
+                        <tr><td>2031</td><td>ICMS/ISS reduz p/ 70%</td><td>IBS sobe (30% ref)</td><td>Aceleração</td></tr>
+                        <tr><td>2032</td><td>ICMS/ISS reduz p/ 60%</td><td>IBS sobe (40% ref)</td><td>Aceleração</td></tr>
+                        <tr style="background:#e8f5e9"><td>2033</td><td>Extintos</td><td>100% IBS/CBS (26,5%)</td><td>Sistema Pleno</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="alert alert-info" style="margin-top:20px;">
+                    <strong>📋 Obrigações Acessórias 2026:</strong>
+                    <ul style="margin-top:5px; margin-left:15px; font-size:12px;">
+                        <li>NF-e deve destacar CBS (0,9%) e IBS (0,1%) - caráter informativo</li>
+                        <li>Valores são compensáveis com PIS/COFINS</li>
+                        <li>Empresas Simples Nacional dispensadas até 2027</li>
+                    </ul>
+                </div>
+
+                <div class="disclaimer-box">
+                    <div class="title">⚠️ Disclaimer</div>
+                    <p>O cronograma acima é baseado na EC 132/2023 e LC 214/2025. Regulamentações complementares podem alterar datas e alíquotas. Acompanhe as publicações oficiais do Ministério da Fazenda e Receita Federal.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab_comparativo" class="tab-content">
+             <div class="card">
+                <div class="card-title">📊 Comparativo Regime Atual vs Todos os Anos</div>
+                <div class="row triple">
+                    <div>
+                        <label>Faturamento Anual</label>
+                        <div class="input-money"><input class="money-mask" type="text" id="fatComp" placeholder="0,00" inputmode="numeric"></div>
+                    </div>
+                    <div>
+                        <label>Compras (Crédito)</label>
+                        <div class="input-money"><input class="money-mask" type="text" id="compraComp" placeholder="0,00" inputmode="numeric"></div>
+                    </div>
+                    <div>
+                        <label>Regime Atual</label>
+                        <select id="regimeComp">
+                            <option value="compararTodos">📊 Comparar TODOS os Regimes</option>
+                            <option value="simples">Simples Nacional</option>
+                            <option value="presumido">Lucro Presumido</option>
+                            <option value="real">Lucro Real</option>
+                            <option value="mei">MEI</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" id="btnComparativo">Gerar Comparativo</button>
+                <div id="resComparativo" style="margin-top:20px;"></div>
+
+                <div class="disclaimer-box">
+                    <div class="title">⚠️ Disclaimer</div>
+                    <p>Comparativo utiliza os mesmos parâmetros da aba Calculadora (UF, tipo de atividade, regime especial, etc.). Para comparações precisas, preencha todos os campos na aba principal.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab_tabelas" class="tab-content">
+            <div class="card">
+                <div class="card-title">📋 Tabelas Simples Nacional (Base 2025/2026)</div>
+                <div class="tabs" style="margin-bottom:15px;background:#f5f5f5;">
+                    <button class="tab-anexo active" data-anexo="1">Anexo I</button>
+                    <button class="tab-anexo" data-anexo="2">Anexo II</button>
+                    <button class="tab-anexo" data-anexo="3">Anexo III</button>
+                    <button class="tab-anexo" data-anexo="4">Anexo IV</button>
+                    <button class="tab-anexo" data-anexo="5">Anexo V</button>
+                </div>
+                <div id="tblAnexo"></div>
+
+                <div class="alert alert-warning" style="margin-top:20px;">
+                    <strong>⚠️ Fator R (Anexo V → III):</strong>
+                    <p style="margin-top:5px; font-size:12px;">
+                        Se a folha de pagamento (salários + pró-labore + encargos) dos últimos 12 meses for ≥ 28% do faturamento bruto,
+                        a empresa do Anexo V pode ser tributada pelo Anexo III (alíquotas menores).
+                    </p>
+                </div>
+
+                <div class="disclaimer-box">
+                    <div class="title">⚠️ Disclaimer</div>
+                    <p>Tabelas conforme LC 123/2006 e alterações. As alíquotas do Simples Nacional permanecerão inalteradas até 2026. A partir de 2027, podem haver mudanças com a implementação da CBS/IBS.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab_entenda" class="tab-content">
+            <div class="card">
+                <div class="card-title">📚 O Essencial da Reforma Tributária (EC 132/2023)</div>
+
+                <p style="margin-bottom:20px; font-size:13px; color:#555; line-height:1.5;">
+                    O Brasil está migrando de um sistema complexo de 5 impostos (PIS, COFINS, IPI, ICMS, ISS) para um modelo de <strong>IVA Dual (Imposto sobre Valor Agregado)</strong>. O objetivo é a não-cumulatividade plena, mas a transição exige cuidado redobrado com o fluxo de caixa.
+                </p>
+
+                <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+                    <div class="system-box old" style="flex:1; margin:0;">
+                        <div class="title" style="color:#c0392b">🔻 Sai (Sistema Atual)</div>
+                        <ul style="padding-left:15px; font-size:11px; color:#666;">
+                            <li><strong>Federal:</strong> PIS, COFINS, IPI</li>
+                            <li><strong>Estadual:</strong> ICMS (27 legislações)</li>
+                            <li><strong>Municipal:</strong> ISS (5.570 legislações)</li>
+                        </ul>
+                    </div>
+                    <div class="system-box new" style="flex:1; margin:0;">
+                        <div class="title" style="color:#27ae60">✅ Entra (IVA Dual)</div>
+                        <ul style="padding-left:15px; font-size:11px; color:#666;">
+                            <li><strong>CBS (Federal):</strong> Unifica PIS, COFINS, IPI.</li>
+                            <li><strong>IBS (Subnacional):</strong> Unifica ICMS e ISS.</li>
+                            <li><strong>IS (Seletivo):</strong> "Imposto do Pecado" (cigarro, bebidas, etc).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4 style="margin:20px 0 10px; color:#0f3460; border-bottom:1px solid #eee; padding-bottom:5px;">⚠️ Pontos Críticos de Atenção</h4>
+
+                <div class="alert alert-info">
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <div style="font-size:24px;">💳</div>
+                        <div>
+                            <strong>Split Payment (O Fim da Inadimplência):</strong>
+                            <p style="margin-top:5px; line-height:1.4;">
+                                É a mudança mais drástica para o <strong>fluxo de caixa</strong>. Ao emitir uma nota fiscal, o valor do imposto (IBS/CBS) <strong>não cairá na conta da sua empresa</strong>. O sistema bancário fará a separação automática no momento da liquidação (Pix, Boleto, Cartão).
+                            </p>
+                            <ul style="margin-top:8px; list-style:none; background:rgba(255,255,255,0.5); padding:8px; border-radius:6px;">
+                                <li>💰 <strong>Parte Líquida:</strong> Cai na sua conta.</li>
+                                <li>🏛️ <strong>Parte do Tributo:</strong> Vai direto para o Tesouro/Comitê Gestor.</li>
+                            </ul>
+                            <p style="margin-top:8px; font-size:11px; background:#fff3e0; padding:5px; border-radius:4px;">
+                                <strong>2027:</strong> B2B (empresas) = Split facultativo | B2C (consumidor final) = Split obrigatório
+                            </p>
+                            <p style="margin-top:5px; font-size:10px; opacity:0.8;">*Isso exige que a empresa tenha capital de giro próprio, pois não poderá mais "trabalhar" com o dinheiro do imposto até o dia do vencimento da guia.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-success">
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <div style="font-size:24px;">🔄</div>
+                        <div>
+                            <strong>Crédito Pleno (Imposto contra Imposto):</strong>
+                            <p style="margin-top:5px; line-height:1.4;">
+                                Hoje, empresas do Lucro Presumido (Cumulativo) não tomam crédito da maioria das despesas. Na Reforma, vale o princípio financeiro:
+                            </p>
+                            <p style="margin-top:5px; font-weight:600;">"Tudo o que a empresa paga de IBS/CBS na compra vira crédito para abater na venda."</p>
+                            <p style="margin-top:5px; line-height:1.4;">
+                                Isso inclui: energia elétrica, serviços tomados, aluguel (PJ), software e insumos. Para empresas de Serviços (B2B), isso ameniza o aumento da alíquota nominal.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning" style="border-left-color:#f39c12; background:#fffbf0; color:#b7791f;">
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <div style="font-size:24px;">📉</div>
+                        <div>
+                            <strong>O Dilema do Simples Nacional (A partir de 2027/2029):</strong>
+                            <p style="margin-top:5px; line-height:1.4;">
+                                Empresas do Simples poderão escolher entre dois caminhos, impactando sua competitividade B2B:
+                            </p>
+                            <ul style="margin-top:5px; margin-left:15px;">
+                                <li style="margin-bottom:5px;"><strong>Caminho A (Guia Única):</strong> Paga menos imposto, mas transfere <em>pouco crédito</em> para o cliente (apenas o efetivamente pago). Grandes clientes podem evitar comprar de você.</li>
+                                <li><strong>Caminho B (Híbrido):</strong> Paga IBS/CBS "por fora" (alíquota cheia) para transferir crédito integral, e o resto (IRPJ/CSLL/CPP) dentro do Simples.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert" style="border-left-color:#9b59b6; background:#f5f0ff; color:#6c3483;">
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                        <div style="font-size:24px;">📋</div>
+                        <div>
+                            <strong>LC 224/2025 - Lucro Presumido > R$ 5 milhões:</strong>
+                            <p style="margin-top:5px; line-height:1.4;">
+                                A partir de 2026, empresas no Lucro Presumido com receita bruta anual superior a R$ 5 milhões terão <strong>acréscimo de 10%</strong> nos percentuais de presunção sobre o valor que exceder esse limite.
+                            </p>
+                            <p style="margin-top:5px; font-size:11px;">
+                                Exemplo: Serviços com receita de R$ 7M → Base normal (32%) até R$ 5M + Base majorada (35,2%) sobre R$ 2M excedentes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="disclaimer-box">
+                    <div class="title">⚠️ Disclaimer Geral</div>
+                    <p style="margin-bottom:8px;">Este conteúdo tem caráter <strong>informativo e educacional</strong>. Não substitui consultoria jurídica, contábil ou tributária profissional.</p>
+                    <ul>
+                        <li>Legislação base: EC 132/2023, LC 214/2025, LC 123/2006</li>
+                        <li>Regulamentações complementares podem alterar as regras apresentadas</li>
+                        <li>Alíquotas CBS/IBS são estimativas oficiais sujeitas a confirmação</li>
+                        <li>Sempre consulte um profissional habilitado para decisões tributárias</li>
+                    </ul>
+                </div>
+
+            </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+    <script>
+        // Sincronizar slider com input ISS
+        document.addEventListener('DOMContentLoaded', function() {
+            const issInput = document.getElementById('issAliq');
+            const issRange = document.getElementById('issRange');
+
+            if (issInput && issRange) {
+                issRange.addEventListener('input', function() {
+                    issInput.value = this.value;
+                    issInput.dispatchEvent(new Event('input', { bubbles: true }));
+                });
+
+                issInput.addEventListener('input', function() {
+                    issRange.value = this.value;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
